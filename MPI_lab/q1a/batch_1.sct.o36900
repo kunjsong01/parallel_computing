@@ -1,0 +1,214 @@
+Running on 1 mpi processes
+Process 0 of 1 is alive
+MASTER output
+x[0] = 6.284000 
+x[n-1] = 61445.284000 
+vector add time = 0.418421 seconds 
+ 
+Sum of x() = 1887792168.959171 
+sum time = 0.120429 
+ 
+matrix update time = 0.242308 seconds 
+ 
+y[0] = 6.284000 
+y[m-1] = 264849.408000 
+trimv time = 0.352023 seconds 
+ 
+Total time = 2.804353 seconds 
+ 
+End MASTER output
+myid=0
+vector add time = 0.418421 seconds 
+ 
+Running on 2 mpi processes
+Process 0 of 2 is alive
+Process 1 of 2 is alive
+MASTER output
+x[0] = 6.284000 
+x[n-1] = 61445.284000 
+vector add time = 0.282719 seconds 
+ 
+Sum of x() = 1887792168.959171 
+sum time = 0.130383 
+ 
+matrix update time = 0.233864 seconds 
+ 
+y[0] = 6.284000 
+y[m-1] = 264849.408000 
+trimv time = 0.340402 seconds 
+ 
+Total time = 3.290077 seconds 
+ 
+End MASTER output
+myid=0
+vector add time = 0.282719 seconds 
+ 
+myid=1
+vector add time = 0.271665 seconds 
+ 
+Running on 4 mpi processes
+Process 0 of 4 is alive
+Process 1 of 4 is alive
+Process 2 of 4 is alive
+Process 3 of 4 is alive
+myid=2
+vector add time = 0.083135 seconds 
+ 
+myid=3
+vector add time = 0.080155 seconds 
+ 
+MASTER output
+x[0] = 6.284000 
+x[n-1] = 61445.284000 
+vector add time = 0.107002 seconds 
+ 
+Sum of x() = 1887792168.959171 
+sum time = 0.116383 
+ 
+matrix update time = 0.255432 seconds 
+ 
+y[0] = 6.284000 
+y[m-1] = 264849.408000 
+trimv time = 0.345733 seconds 
+ 
+Total time = 3.386548 seconds 
+ 
+End MASTER output
+myid=0
+vector add time = 0.107002 seconds 
+ 
+myid=1
+vector add time = 0.082805 seconds 
+ 
+Running on 8 mpi processes
+Process 0 of 8 is alive
+Process 1 of 8 is alive
+Process 2 of 8 is alive
+Process 3 of 8 is alive
+Process 4 of 8 is alive
+Process 5 of 8 is alive
+Process 6 of 8 is alive
+Process 7 of 8 is alive
+myid=5
+vector add time = 0.042096 seconds 
+ 
+myid=6
+vector add time = 0.041433 seconds 
+ 
+myid=7
+vector add time = 0.040587 seconds 
+ 
+MASTER output
+x[0] = 6.284000 
+x[n-1] = 61445.284000 
+vector add time = 0.057267 seconds 
+ 
+Sum of x() = 1887792168.959171 
+sum time = 0.129051 
+ 
+matrix update time = 0.215011 seconds 
+ 
+y[0] = 6.284000 
+y[m-1] = 264849.408000 
+trimv time = 0.324744 seconds 
+ 
+Total time = 3.683647 seconds 
+ 
+End MASTER output
+myid=0
+vector add time = 0.057267 seconds 
+ 
+myid=1
+vector add time = 0.041440 seconds 
+ 
+myid=2
+vector add time = 0.041788 seconds 
+ 
+myid=3
+vector add time = 0.041405 seconds 
+ 
+myid=4
+vector add time = 0.050184 seconds 
+ 
+Running on 16 mpi processes
+Process 0 of 16 is alive
+Process 1 of 16 is alive
+Process 2 of 16 is alive
+Process 3 of 16 is alive
+Process 4 of 16 is alive
+Process 5 of 16 is alive
+Process 6 of 16 is alive
+Process 7 of 16 is alive
+Process 8 of 16 is alive
+Process 9 of 16 is alive
+Process 10 of 16 is alive
+Process 11 of 16 is alive
+Process 12 of 16 is alive
+Process 13 of 16 is alive
+Process 14 of 16 is alive
+Process 15 of 16 is alive
+myid=11
+vector add time = 0.020298 seconds 
+ 
+myid=12
+vector add time = 0.021250 seconds 
+ 
+myid=13
+vector add time = 0.019948 seconds 
+ 
+myid=14
+vector add time = 0.019974 seconds 
+ 
+myid=15
+vector add time = 0.020001 seconds 
+ 
+MASTER output
+x[0] = 6.284000 
+x[n-1] = 61445.284000 
+vector add time = 0.033000 seconds 
+ 
+Sum of x() = 1887792168.959171 
+sum time = 0.120795 
+ 
+matrix update time = 0.239700 seconds 
+ 
+y[0] = 6.284000 
+y[m-1] = 264849.408000 
+trimv time = 0.335044 seconds 
+ 
+Total time = 4.065191 seconds 
+ 
+End MASTER output
+myid=0
+vector add time = 0.033000 seconds 
+ 
+myid=1
+vector add time = 0.020330 seconds 
+ 
+myid=2
+vector add time = 0.020451 seconds 
+ 
+myid=3
+vector add time = 0.020007 seconds 
+ 
+myid=4
+vector add time = 0.023702 seconds 
+ 
+myid=5
+vector add time = 0.019998 seconds 
+ 
+myid=6
+vector add time = 0.019966 seconds 
+ 
+myid=7
+vector add time = 0.020442 seconds 
+ 
+myid=8
+vector add time = 0.024771 seconds 
+ 
+myid=9
+vector add time = 0.020234 seconds 
+ 
+myid=10
+vector add time = 0.020562 seconds 
+ 

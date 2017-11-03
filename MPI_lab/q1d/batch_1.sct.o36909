@@ -1,0 +1,77 @@
+Running on 1 mpi processes
+Process 0 of 1 is alive
+[mcore48:16592] *** An error occurred in MPI_Reduce
+[mcore48:16592] *** reported by process [47836799369217,0]
+[mcore48:16592] *** on communicator MPI_COMM_WORLD
+[mcore48:16592] *** MPI_ERR_ARG: invalid argument of some other kind
+[mcore48:16592] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[mcore48:16592] ***    and potentially your MPI job)
+-------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code.. Per user-direction, the job has been aborted.
+-------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[57199,1],0]
+  Exit code:    13
+--------------------------------------------------------------------------
+Running on 2 mpi processes
+Process 0 of 2 is alive
+Process 1 of 2 is alive
+[mcore48:16596] *** An error occurred in MPI_Reduce
+[mcore48:16596] *** reported by process [47037935714305,0]
+[mcore48:16596] *** on communicator MPI_COMM_WORLD
+[mcore48:16596] *** MPI_ERR_ARG: invalid argument of some other kind
+[mcore48:16596] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[mcore48:16596] ***    and potentially your MPI job)
+Running on 4 mpi processes
+Process 2 of 4 is alive
+Process 0 of 4 is alive
+Process 1 of 4 is alive
+Process 3 of 4 is alive
+[mcore48:16603] *** An error occurred in MPI_Reduce
+[mcore48:16603] *** reported by process [46917676957697,0]
+[mcore48:16603] *** on communicator MPI_COMM_WORLD
+[mcore48:16603] *** MPI_ERR_ARG: invalid argument of some other kind
+[mcore48:16603] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[mcore48:16603] ***    and potentially your MPI job)
+Running on 8 mpi processes
+Process 4 of 8 is alive
+Process 5 of 8 is alive
+Process 0 of 8 is alive
+Process 1 of 8 is alive
+Process 2 of 8 is alive
+Process 3 of 8 is alive
+Process 6 of 8 is alive
+Process 7 of 8 is alive
+[mcore48:16619] *** An error occurred in MPI_Reduce
+[mcore48:16619] *** reported by process [47407300149249,0]
+[mcore48:16619] *** on communicator MPI_COMM_WORLD
+[mcore48:16619] *** MPI_ERR_ARG: invalid argument of some other kind
+[mcore48:16619] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[mcore48:16619] ***    and potentially your MPI job)
+Running on 16 mpi processes
+Process 0 of 16 is alive
+Process 1 of 16 is alive
+Process 2 of 16 is alive
+Process 4 of 16 is alive
+Process 5 of 16 is alive
+Process 6 of 16 is alive
+Process 8 of 16 is alive
+Process 9 of 16 is alive
+Process 10 of 16 is alive
+Process 11 of 16 is alive
+Process 12 of 16 is alive
+Process 13 of 16 is alive
+Process 14 of 16 is alive
+Process 3 of 16 is alive
+Process 15 of 16 is alive
+Process 7 of 16 is alive
+[mcore48:16649] *** An error occurred in MPI_Reduce
+[mcore48:16649] *** reported by process [47896915738625,0]
+[mcore48:16649] *** on communicator MPI_COMM_WORLD
+[mcore48:16649] *** MPI_ERR_ARG: invalid argument of some other kind
+[mcore48:16649] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[mcore48:16649] ***    and potentially your MPI job)
