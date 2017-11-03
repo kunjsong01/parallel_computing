@@ -1,0 +1,4 @@
+Acknowledgement:
+The original program(unparallel version) was from my university course.
+This is a parallelized version based on the original program done by myself.
+It can be used for future reference to exploit the power of MPI. 
