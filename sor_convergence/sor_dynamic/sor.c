@@ -102,6 +102,7 @@ int main(int argc, char *argv[]){
 
 	while(error >= tol){
 
+	// Increase N will affect the loading of xnew into cache (L1/L2/L3)
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++){
 
