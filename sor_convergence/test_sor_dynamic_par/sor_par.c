@@ -25,7 +25,8 @@
 //double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double **g, int iter, double **s, int N);
-void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h, int N);
+void matrix_initialise(double **x_matrix, double **solution_matrix, double h, int N);
+void boundary_condition(double **x_matrix, double **xnew_matrix, int N);
 
 int main(int argc, char *argv[]){
 	int N;
@@ -82,7 +83,10 @@ int main(int argc, char *argv[]){
 	}
    
 	// initialise x, y
-	matrix_initialise(x_ptr, xnew_ptr, solution_ptr, h, N);
+	matrix_initialise(x_ptr, solution_ptr, h, N);
+
+	// apply boundary conditions
+	boundary_condition(x_ptr, xnew_ptr, N);
 	
 	// start time
     calcerror_start = omp_get_wtime();
@@ -118,7 +122,7 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h, int N){
+void matrix_initialise(double **x_matrix, double **solution_matrix, double h, int N){
 	int i, j;
 	for(i=0; i<N; i++)
 		x_matrix[i][N-1] = sin((double)i*h);
@@ -128,7 +132,10 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 	for(i=0; i<N; i++)
 		for(j=0; j<N; j++)
 			solution_matrix[i][j] = sinh((double)j*h) * sin((double)i*h)/sinh(M_PI);
+}
 
+void boundary_condition(double **x_matrix, double **xnew_matrix, int N){
+	int i,j;
 	// apply boundary conditions, copy the box boundaires from x to xnew matrix
 	for(i=0; i<N; i++){
 		for(j=0; j<N; j++){
