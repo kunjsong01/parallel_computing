@@ -4,9 +4,7 @@
 #include <omp.h>
 
 /*
- * This is the parallel version of sor algorithm to solve the Laplace Equation using wavefront 
- * parallelism, i.e. accessing the array in diagonal strips to obviate the dependency when calculating
- * U(k+1).
+ * This is the parallel version of sor algorithm to solve the Laplace Equation.
  * The main strategy is to:
  * 		- Separate the iterative computation blocks from the main routine to
  * 		  make them easier for parallelisation
@@ -150,45 +148,13 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 void update_points(double **x_matrix, double **xnew_matrix, double omega, int N){
 
 	int i, j;
-
-#if 0	
-	/*
-	 * The "pointer to pointer" logic here may hamper the speed lot. This was originally
-	 * made to allow accesses to those 2-D matrices. However, experiments showed that 
-	 * it will become very slow even trying to print out the value of x_matrix after
-	 * calculating the xnew_matrix. 
-	 * So let's switch back to the static array
-	 */
-	// a pointer to each diagonal strip, max length is N (the diagonal of an N*N matrix)
-	// has to be a pointer to pointer(the starting point of that diagonal strip)
-	double **dstrip_ptr;
-	int n_task = 0; // number of non-boundary elements in the diagonal strip
-	int counter; // counter to ignore boundary
-	int dlength; // length of elements in the diagonal strip
 	
-	// An N*N square matrix has (2*n-1) diagnonal strips
-	for(i=0; i<(2*N-1); i++) {
-		counter = 1;
-		printf("Slice %d:\n ", i);
-		int shift = (i < N)? 0 : (i - N + 1);
-		dlength = (i-shift) - shift + 1;
-		printf("\t @@dlength: %d", dlength);
-		for(j=shift; j<= (i-shift); j++){
-			// ignore the boundary
-			if ( (counter != 1) || (counter != dlength) ){
-				xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
-			}
-			printf("%f ", x_matrix[j][i-j]);// This line is very time consuming!!!
-			counter++;
-		}
-		printf("\n");
-	}
-#endif
 	// update points in x, put it in the xnew and copy back to x 
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++){
 			xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
 		}
+
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++)
 			x_matrix[i][j] = xnew_matrix[i][j];
