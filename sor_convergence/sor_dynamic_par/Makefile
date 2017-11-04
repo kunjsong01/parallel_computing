@@ -13,5 +13,8 @@ LFLAGS = -lm
 sor: sor.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
+sor_par: sor_par.o
+	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
+
 clean:
-	rm *.o sor 
+	rm *.o sor sor_par 
