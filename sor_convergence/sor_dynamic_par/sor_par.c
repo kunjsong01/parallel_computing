@@ -3,19 +3,30 @@
 #include <math.h>
 #include <omp.h>
 
-// ***  Solution of Laplace's Equation.
-// ***
-// ***  Uxx + Uyy = 0
-// ***  0 <= x <= pi, 0 <= y <= pi
-// ***  U(x,pi) = sin(x), U(x,0) = U(0,y) = U(pi,y) = 0
-// ***
-// ***  then U(x,y) = (sinh(y)*sin(x)) / sinh(pi)
-// ***
-// ***  Should converge with: 
-// ***   tol = 0.001 and N = 22  in  60 iterations.
-// ***   and with tol = 0.001 and N = 102 in 200 iterations.
-// ***   and with tol = 0.001 and N = 502 in 980 iterations.
-// *** 
+/*
+ * This is the parallel version of sor algorithm to solve the Laplace Equation.
+ * The main strategy is to:
+ * 		- Separate the iterative computation blocks from the main routine to
+ * 		  make them easier for parallelisation
+ * 		- Apply OpenMP parallelisation techniques in the iteration space and data space 
+ * The mathematical problem it's trying to solve is explained below. 
+ *
+ *  Solution of Laplace's Equation.
+ *
+ *  Uxx + Uyy = 0
+ *  0 <= x <= pi, 0 <= y <= pi
+ *  U(x,pi) = sin(x), U(x,0) = U(0,y) = U(pi,y) = 0
+ *
+ *  then U(x,y) = (sinh(y)*sin(x)) / sinh(pi)
+ *
+ *  Should converge with: 
+ *   tol = 0.001 and N = 22  in  60 iterations.
+ *   and with tol = 0.001 and N = 102 in 200 iterations.
+ *   and with tol = 0.001 and N = 502 in 980 iterations.
+ * 
+ *  Author: Kunjian Song
+ *  Date: 04/11/2017
+ */
 
 // now we try to do dynamic mem allocation to facilitate the test of various N values
 //#define N 502
@@ -24,8 +35,9 @@
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
 //double x[N][N], xnew[N][N], solution[N][N];
 
-double calcerror(double **g, int iter, double **s, int N);
+double calcerror(double **x_matrix, int iter, double **solution_matrix, int N);
 void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h, int N);
+void update_points(double **x_matrix, double **xnew_matrix, double omega, int N); 
 
 int main(int argc, char *argv[]){
 	int N;
@@ -91,17 +103,9 @@ int main(int argc, char *argv[]){
 	error = calcerror(x_ptr, iter, solution_ptr, N);
 
 	while(error >= tol){
-
+		// update all the points in x if error is not acceptable
 		// Increase N will affect the loading of xnew into cache (L1/L2/L3)
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++){
-				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-			}
-
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++)
-				x[i][j] = xnew[i][j];
-
+		update_points(x_ptr, xnew_ptr, omega, N);
 		iter++;
 
 		if (fmod(iter, 20) == 0)
@@ -140,13 +144,28 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 	}
 }
 
-double calcerror(double **g, int iter, double **s, int N){
-	int i,j;
-	double error = 0.0;
+void update_points(double **x_matrix, double **xnew_matrix, double omega, int N){
+
+	int i, j;
+	// update points in x, put it in the xnew buffer and copy back to x 
+	for(i=1; i<N-1; i++)
+		for(j=1; j<N-1; j++){
+			xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
+		}
 
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++)
-			error = MAX(error, fabs(s[i][j] - g[i][j]));
+			x_matrix[i][j] = xnew_matrix[i][j];
+} 
+
+double calcerror(double **x_matrix, int iter, double **solution_matrix, int N){
+	int i,j;
+	double error = 0.0;
+
+	// TO-DO: implement parallel omp reduce
+	for(i=1; i<N-1; i++)
+		for(j=1; j<N-1; j++)
+			error = MAX(error, fabs(solution_matrix[i][j] - x_matrix[i][j]));
 
 	printf("On iteration %d error= %f\n",iter, error);
 	return error;
