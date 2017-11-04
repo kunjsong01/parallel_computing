@@ -17,7 +17,8 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 502
+//#define N 502
+#define N 30
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -25,6 +26,7 @@
 
 double calcerror(double **g, int iter, double **s);
 void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h);
+void update_points(double **x_matrix, double **xnew_matrix, double omega); 
 
 int main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
@@ -37,20 +39,6 @@ int main(int argc, char *argv[]){
 	// variables for omp timmer
 	double calcerror_start; 
 	double calcerror_time = 0.0;
-
-#if 0
-	int N;
-	/* argument parsing, making N configurable to investigate the
-	 * correlation between problem size and iterations to converge
-	 */
-	if ( argc == 2 ) {
-		N = atoi(argv[1]);
-		printf("===== Running with N=%d =====\n", N);
-	}
-	else{
-		printf("Incorrect number of arguments supplied. Please give the problem size(integer) \n");
-	}
-#endif
 
 	// calculate constant values, h and omega 
 	h = M_PI/(double)(N-1);
@@ -92,16 +80,9 @@ int main(int argc, char *argv[]){
 	error = calcerror(x_ptr, iter, solution_ptr);
 
 	while(error >= tol){
-
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++){
-
-				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-			}
-
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++)
-				x[i][j] = xnew[i][j];
+		// update all the points in x if error is not acceptable
+		// Increase N will affect the loading of xnew into cache (L1/L2/L3)
+		update_points(x_ptr, xnew_ptr, omega);
 
 		iter++;
 
@@ -131,6 +112,21 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 	for(i=0; i<N; i++)
 		for(j=0; j<N; j++)
 			solution_matrix[i][j] = sinh((double)j*h) * sin((double)i*h)/sinh(M_PI);
+}
+
+void update_points(double **x_matrix, double **xnew_matrix, double omega){
+
+	int i, j;
+	
+	// update points in x, put it in the xnew and copy back to x 
+	for(i=1; i<N-1; i++)
+		for(j=1; j<N-1; j++){
+			xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
+		}
+
+	for(i=1; i<N-1; i++)
+		for(j=1; j<N-1; j++)
+			x_matrix[i][j] = xnew_matrix[i][j];
 }
 
 double calcerror(double **g, int iter, double **s){

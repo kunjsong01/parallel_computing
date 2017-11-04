@@ -157,7 +157,8 @@ void update_points(double **x_matrix, double **xnew_matrix, double omega, int N)
 	 * made to allow accesses to those 2-D matrices. However, experiments showed that 
 	 * it will become very slow even trying to print out the value of x_matrix after
 	 * calculating the xnew_matrix. 
-	 * So let's switch back to the static array
+	 * So let's switch back to the static array.
+	 * Also: this program does not work with N=30. It will not terminate even though the error is less than tol.
 	 */
 	// a pointer to each diagonal strip, max length is N (the diagonal of an N*N matrix)
 	// has to be a pointer to pointer(the starting point of that diagonal strip)
