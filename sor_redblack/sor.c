@@ -56,18 +56,25 @@ int main(int argc, char *argv[]){
 	error = calcerror(x, iter);
 
 	while(error >= tol){
-
+		//red
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++){
-
-				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+			if((i+j)%2==0){
+				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));}
 			}
-		
-				
 
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++)
-				x[i][j] = xnew[i][j];
+					x[i][j] = xnew[i][j];
+		//black
+		for(i=1; i<N-1; i++)
+			for(j=1; j<N-1; j++){
+				if((i+j)%2==1){xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));}
+					}
+
+				for(i=1; i<N-1; i++)
+					for(j=1; j<N-1; j++)
+							x[i][j] = xnew[i][j];
 
 		iter++;
 
