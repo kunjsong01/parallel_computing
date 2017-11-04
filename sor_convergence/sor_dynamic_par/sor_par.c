@@ -46,6 +46,9 @@ int main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
 	double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j;
+	// this "pointer to pointer" logic causes lots of troubles during the experiment, please see the
+	// comments in update_points function.
+	// Actually, x_ptr is unnecessary. Just use x. It would do the same work!
 	double **x, **x_ptr; 
 	double **xnew, **xnew_ptr;
 	double **solution, **solution_ptr;
