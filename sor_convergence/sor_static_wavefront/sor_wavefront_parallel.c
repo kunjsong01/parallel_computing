@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 50 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
+#define N 180 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -82,10 +82,10 @@ int main(int argc, char *argv[]){
 	while(error >= tol){
 		// wavefront parallelism
 		for (i=0; i < (2*N -1); i++){
-			printf("Slice: %d\n", i);
 			int k = (i < N) ? 0 : (i - N + 1);
 			slength = (i - k -k + 1);
 			if (slength > 2) {
+				#pragma omp parallel for
 				for (j=k; j <= i-k; j++){
 					if (j==k || j == i-k) {
 						continue; // skip boundary conditions

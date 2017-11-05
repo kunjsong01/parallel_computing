@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 50 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
+#define N 180 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
