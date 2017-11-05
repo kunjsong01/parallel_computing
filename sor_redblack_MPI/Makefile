@@ -1,5 +1,5 @@
-MPIDIR = /usr/lib64/openmpi-1.10/bin
-#MPIDIR = /usr/bin
+#MPIDIR = /usr/lib64/openmpi-1.10/bin
+MPIDIR = /usr/bin
 #MPIDIR = /usr/local/software/mpich2-install/bin
 CC = $(MPIDIR)/mpicc
 OMP_FLAG = -fopenmp

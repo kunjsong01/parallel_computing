@@ -27,8 +27,7 @@
 double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double g[][N], int iter);
-
-// MPI specific data
+boolean first_time;
 
 void *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
@@ -69,37 +68,54 @@ void *main(int argc, char *argv[]){
 	}
 
 	error = calcerror(x, iter);
-
+	firsttime = true;
 	while(error >= tol){
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==0){
-					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+
+		//red for id =0
+		if(myid==0){
+			if(firstime){
+				setup black;
+				firstime= false;
+			}
+
+			for(i=1; i<N-1; i++){
+				for(j=1; j<N-1; j++){
+					if((i+j)%2==0){
+						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+					}
 				}
 			}
-		}
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==0){
-					x[i][j] = xnew[i][j];
+			for(i=1; i<N-1; i++){
+				for(j=1; j<N-1; j++){
+					if((i+j)%2==0){
+						x[i][j] = xnew[i][j];
+					}
 				}
 			}
-		}
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==1){
-					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-				}
-			}
-		}
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==1){
-					x[i][j] = xnew[i][j];
-				}
-			}
+		//MPI_Sendrecv(
 		}
 
+		// black for id==1
+		if(myid==1){
+			//receive red if not first time or last
+			for(i=1; i<N-1; i++){
+				for(j=1; j<N-1; j++){
+					if((i+j)%2==1){
+						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+					}
+				}
+			}
+			for(i=1; i<N-1; i++){
+				for(j=1; j<N-1; j++){
+					if((i+j)%2==1){
+						x[i][j] = xnew[i][j];
+					}
+				}
+			}
+		// MPI sendrecv
+		}
+	
+		MPI_Allgather(
 		iter++;
 
 		if (fmod(iter, 20) == 0)
