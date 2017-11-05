@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // ***  Solution of Laplace's Equation.
-// ***
+// ***   Note that this experiment is using wavefront
 // ***  Uxx + Uyy = 0
 // ***  0 <= x <= pi, 0 <= y <= pi
 // ***  U(x,pi) = sin(x), U(x,0) = U(0,y) = U(pi,y) = 0
@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 502
+#define N 50 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -25,7 +25,6 @@
 
 double calcerror(double **g, int iter, double **s);
 void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h);
-void update_points(double **x_matrix, double **xnew_matrix, double omega); 
 
 int main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
@@ -34,6 +33,8 @@ int main(int argc, char *argv[]){
 	double x[N][N], **x_ptr; 
 	double xnew[N][N], **xnew_ptr;
 	double solution[N][N], **solution_ptr;
+	int slength; // variable to skip the first and last two diagonal strips
+	int z; // variable to skip boundary elements
 
 	// variables for omp timmer
 	double calcerror_start; 
@@ -79,9 +80,30 @@ int main(int argc, char *argv[]){
 	error = calcerror(x_ptr, iter, solution_ptr);
 
 	while(error >= tol){
-		// update all the points in x if error is not acceptable
-		// Increase N will affect the loading of xnew into cache (L1/L2/L3)
-		update_points(x_ptr, xnew_ptr, omega);
+		// wavefront parallelism
+		for (i=0; i < (2*N -1); i++){
+			z = 1;
+			printf("Slice: %d\n", i);
+			int k = (i < N) ? 0 : (i - N + 1);
+			slength = (i - k -k + 1);
+			//printf("This is slength: %d \n", slength); 
+			// the first pair and last pair of the diagonal strips are all boundary conditions
+			if (slength > 2) {
+				for (j=k; j <= i-k; j++){
+					//printf("\t This is tracking counter z: %d \n", z);
+					//if ((i != 0) && (i != (N-1)) && (j != 0) && (j != (N-1))){
+					if ((z != 1) && (z != slength)){
+						xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] \
+										+ x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
+					}
+					z++;
+				}
+			}
+		}
+
+		for(i=1; i<N-1; i++)
+			for(j=1; j<N-1; j++)
+				x[i][j] = xnew[i][j];
 
 		iter++;
 
@@ -113,25 +135,9 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 			solution_matrix[i][j] = sinh((double)j*h) * sin((double)i*h)/sinh(M_PI);
 }
 
-void update_points(double **x_matrix, double **xnew_matrix, double omega){
-
-	int i, j;
-
-	// TO-DO: wavefront array access
-	
-	// update points in x, put it in the xnew and copy back to x 
-	for(i=1; i<N-1; i++)
-		for(j=1; j<N-1; j++){
-			xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
-		}
-
-	for(i=1; i<N-1; i++)
-		for(j=1; j<N-1; j++)
-			x_matrix[i][j] = xnew_matrix[i][j];
-}
-
 double calcerror(double **g, int iter, double **s){
-
+	
+	// TO-DO: openmp reduce
 	int i,j;
 	double error = 0.0;
 
