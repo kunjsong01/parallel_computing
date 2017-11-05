@@ -60,6 +60,8 @@ int main(int argc, char *argv[]){
 	error = calcerror(x, iter);
 
 	while(error >= tol){
+		#pragma omp parallel for			\
+  		schedule (static)			
 		//red
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
@@ -68,7 +70,8 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
+		#pragma omp parallel for			\
+  		schedule (static)
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==0){
@@ -76,7 +79,8 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
+		#pragma omp parallel for			\
+  		schedule (static)
 		//black
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
@@ -85,7 +89,8 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
+		#pragma omp parallel for			\
+  		schedule (static)
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==1){

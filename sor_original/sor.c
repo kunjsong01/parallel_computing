@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <omp.h>
 
 // ***  Solution of Laplace's Equation.
 // ***
@@ -26,12 +25,9 @@ double calcerror(double g[][N], int iter);
 
 int main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
-    double pi = (double)4.0*atan((double)1.0);
+        double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j;
-	double total_start;
-	double total_time = 0.0;
-	
-	total_start = omp_get_wtime();
+
 	h = M_PI/(double)(N-1);
 
 	for(i=0; i<N; i++)
@@ -60,39 +56,18 @@ int main(int argc, char *argv[]){
 	error = calcerror(x, iter);
 
 	while(error >= tol){
-		//red
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==0){
-					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-				}
-			}
-		}
 
-		for(i=1; i<N-1; i++){
+		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++){
-				if((i+j)%2==0){
-					x[i][j] = xnew[i][j];
-				}
-			}
-		}
 
-		//black
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==1){
-					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-				}
+				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
 			}
-		}
+		
+				
 
-		for(i=1; i<N-1; i++){
-			for(j=1; j<N-1; j++){
-				if((i+j)%2==1){
-					x[i][j] = xnew[i][j];
-				}
-			}
-		}
+		for(i=1; i<N-1; i++)
+			for(j=1; j<N-1; j++)
+				x[i][j] = xnew[i][j];
 
 		iter++;
 
@@ -100,10 +75,10 @@ int main(int argc, char *argv[]){
 		  error = calcerror(x, iter);
 		
 	}
-	total_time = omp_get_wtime() - total_start;
+	
 	printf("Omega = %0.20f\n", omega);
 	printf("Convergence in %d iterations for %dx%d grid with tolerance %f.\n", iter, N, N, tol);
-	printf("Total time to convergence: %f seconds\n", total_time);
+
 
 	return 0;
 }
