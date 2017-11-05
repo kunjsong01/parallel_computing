@@ -20,7 +20,6 @@
 #define N 502
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
-
 double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double g[][N], int iter);
@@ -31,7 +30,6 @@ int main(int argc, char *argv[]){
 	int iter=0, i, j;
 	double total_start;
 	double total_time = 0.0;
-	int numthreads;
 	
 	total_start = omp_get_wtime();
 	h = M_PI/(double)(N-1);
@@ -63,10 +61,9 @@ int main(int argc, char *argv[]){
 
 	while(error >= tol){
 		#pragma omp parallel for			\
-  		schedule (static)	
+  		schedule (static)			
 		//red
 		for(i=1; i<N-1; i++){
-		numthreads = omp_get_num_threads();	
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==0){
 					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
@@ -112,7 +109,7 @@ int main(int argc, char *argv[]){
 	printf("Omega = %0.20f\n", omega);
 	printf("Convergence in %d iterations for %dx%d grid with tolerance %f.\n", iter, N, N, tol);
 	printf("Total time to convergence: %f seconds\n", total_time);
-	printf("Number of threads: %i\n", numthreads);
+
 	return 0;
 }
 
