@@ -12,8 +12,11 @@ LFLAGS = -lm
 sor: sor.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
-sor_wavefront: sor_wavefront.o
+sor_wavefront_sequential: sor_wavefront_sequential.o
+	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
+
+sor_wavefront_parallel: sor_wavefront_parallel.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
 clean:
-	rm *.o sor sor_wavefront 
+	rm *.o sor sor_wavefront_sequential sor_wavefront_parallel 

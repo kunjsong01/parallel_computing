@@ -4,7 +4,7 @@
 #include <omp.h>
 
 /*
- * This is the parallel version of sor algorithm to solve the Laplace Equation.
+ * TO-DO:  This is the parallel version of sor algorithm to solve the Laplace Equation.
  * The main strategy is to:
  * 		- Separate the iterative computation blocks from the main routine to
  * 		  make them easier for parallelisation

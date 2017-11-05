@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 179 
+#define N 50 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -83,6 +83,13 @@ int main(int argc, char *argv[]){
 		// Increase N will affect the loading of xnew into cache (L1/L2/L3)
 		// wavefront array access
 		// Sequential wavefront is very slow!
+		/*
+ 		 * An N*N matrix has (2N-1) diagonal strips. 
+ 		 * On each diagonal strip that has a length greater than 2,
+ 		 * we ignore the first and last elements as they are boundary conditions in PDE.
+ 		 * We also ignore the first two and last two diagonal strips in the parallel version
+ 		 * because all elements in those two strips are boundary consitions.  
+		 */
 		for (i=0; i < (2*N -1); i++){
 			z = 1;
 			printf("Slice: %d\n", i);
@@ -93,7 +100,8 @@ int main(int argc, char *argv[]){
 				printf("\t This is tracking counter z: %d \n", z);
 				if (slength > 2) {
 					if ((z != 1) && (z != slength)){
-						xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] + x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
+						xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] \
+										+ x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
 					}
 					z++;
 				}
