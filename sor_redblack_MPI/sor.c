@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include <mpi.h>
 
 // ***  Solution of Laplace's Equation.
 // ***
@@ -24,13 +25,20 @@ double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double g[][N], int iter);
 
+// MPI specific data
+int myid, numprocs, rc, ierr;
+
 int main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
     double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j;
 	double total_start;
 	double total_time = 0.0;
-	
+	ierr = MPI_Init(NULL, NULL); 
+	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+	MPI_Status status;
+	printf ("Process %d of %d is alive\n", myid, numprocs);
 	total_start = omp_get_wtime();
 	h = M_PI/(double)(N-1);
 
@@ -60,9 +68,6 @@ int main(int argc, char *argv[]){
 	error = calcerror(x, iter);
 
 	while(error >= tol){
-		#pragma omp parallel for			\
-  		schedule (static)			
-		//red
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==0){
@@ -70,8 +75,6 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-		#pragma omp parallel for			\
-  		schedule (static)
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==0){
@@ -79,9 +82,6 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-		#pragma omp parallel for			\
-  		schedule (static)
-		//black
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==1){
@@ -89,8 +89,6 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-		#pragma omp parallel for			\
-  		schedule (static)
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j)%2==1){
