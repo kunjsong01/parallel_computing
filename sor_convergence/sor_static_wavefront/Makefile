@@ -12,5 +12,8 @@ LFLAGS = -lm
 sor: sor.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
+sor_wavefront: sor_wavefront.o
+	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
+
 clean:
-	rm *.o sor 
+	rm *.o sor sor_wavefront 
