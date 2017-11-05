@@ -4,7 +4,7 @@
 #include <omp.h>
 
 // ***  Solution of Laplace's Equation.
-// ***
+// ***   Note that this experiment is using wavefront
 // ***  Uxx + Uyy = 0
 // ***  0 <= x <= pi, 0 <= y <= pi
 // ***  U(x,pi) = sin(x), U(x,0) = U(0,y) = U(pi,y) = 0
@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 502
+#define N 179 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -33,24 +33,12 @@ int main(int argc, char *argv[]){
 	double x[N][N], **x_ptr; 
 	double xnew[N][N], **xnew_ptr;
 	double solution[N][N], **solution_ptr;
+	int slength; // variable to skip the first and last two diagonal strips
+	int z; // variable to skip boundary elements
 
 	// variables for omp timmer
 	double calcerror_start; 
 	double calcerror_time = 0.0;
-
-#if 0
-	int N;
-	/* argument parsing, making N configurable to investigate the
-	 * correlation between problem size and iterations to converge
-	 */
-	if ( argc == 2 ) {
-		N = atoi(argv[1]);
-		printf("===== Running with N=%d =====\n", N);
-	}
-	else{
-		printf("Incorrect number of arguments supplied. Please give the problem size(integer) \n");
-	}
-#endif
 
 	// calculate constant values, h and omega 
 	h = M_PI/(double)(N-1);
@@ -92,13 +80,33 @@ int main(int argc, char *argv[]){
 	error = calcerror(x_ptr, iter, solution_ptr);
 
 	while(error >= tol){
-
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++){
-
-				xnew[i][j] = x[i][j]+0.25*omega*(xnew[i-1][j] + xnew[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+		// Increase N will affect the loading of xnew into cache (L1/L2/L3)
+		// wavefront array access
+		// Sequential wavefront is very slow!
+		for (i=0; i < (2*N -1); i++){
+			z = 1;
+			printf("Slice: %d\n", i);
+			int k = (i < N) ? 0 : (i - N + 1);
+			slength = (i - k -k + 1);
+			printf("This is slength: %d \n", slength); 
+			for (j=k; j <= i-k; j++){
+				printf("\t This is tracking counter z: %d \n", z);
+				if (slength > 2) {
+					if ((z != 1) && (z != slength)){
+						xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] + x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
+					}
+					z++;
+				}
 			}
+		}
 
+		#if 0
+			// update points in x, put it in the xnew and copy back to x 
+			for(i=1; i<N-1; i++)
+				for(j=1; j<N-1; j++){
+					xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
+				}
+		#endif
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++)
 				x[i][j] = xnew[i][j];
@@ -134,7 +142,8 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 }
 
 double calcerror(double **g, int iter, double **s){
-
+	
+	// TO-DO: openmp reduce
 	int i,j;
 	double error = 0.0;
 
