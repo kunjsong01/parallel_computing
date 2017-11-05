@@ -1,0 +1,5 @@
+This is the program that was used to evaluate the Gauss-Siedel algorithm using
+various values of N. 
+
+The major change in the program is the dynamic memory allocation for x[][], xnew[][] and solution[][]
+to allow user defined value of N. 

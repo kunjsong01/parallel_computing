@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
 		}
 
 		#if 0
-			// update points in x, put it in the xnew and copy back to x 
+			// This was the original way to traverse the matrix 
 			for(i=1; i<N-1; i++)
 				for(j=1; j<N-1; j++){
 					xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));
