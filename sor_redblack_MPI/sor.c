@@ -20,18 +20,21 @@
 
 #define N 502
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
+#ifndef M_PI
+#define M_PI (3.14159265358979323846)
+#endif
 
 double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double g[][N], int iter);
 
 // MPI specific data
-int myid, numprocs, rc, ierr;
 
-int main(int argc, char *argv[]){
+void *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
-    double pi = (double)4.0*atan((double)1.0);
+	double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j;
+	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
 	ierr = MPI_Init(NULL, NULL); 
