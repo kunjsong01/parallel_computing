@@ -70,38 +70,32 @@ void *main(int argc, char *argv[]){
 
 	while(error >= tol){
 
-		//red for id =0
-		if(myid==0){
 			for(i=1; i<N-1; i++){
 				for(j=1; j<N-1; j++){
-					if((i+j)%2==0){
+					if((i+j)%2==myid){
 						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
 					}
 				}
 			}
-		}
 
-		// black for id==1
-		if(myid==1){
 			for(i=1; i<N-1; i++){
 				for(j=1; j<N-1; j++){
-					if((i+j)%2==1){
-						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+					if((i+j)%2==myid){
+						x[i][j] = xnew[i][j];
 					}
 				}
 			}
-		}
 
+		// Just to take into account that proccesses may run out of time, to avoid race condition.
 		MPI_Barrier(MPI_COMM_WORLD);
-		//MPI Bcast red to black
+
 		for(i=0; i<N; i++){
 				for(j=0; j<N; j++){
-					MPI_Bcast(&i
-					MPI_Bcast(&j
-					MPI_Bcast(&i
-
-//MPI Bcast black to red	
-		
+					if((i+j)%2==myid){
+					MPI_Bcast(&x[i][j], 1, MPI_DOUBLE, myid, MPI_COMM_WORLD);
+					}
+				}
+		}
 
 		iter++;
 
