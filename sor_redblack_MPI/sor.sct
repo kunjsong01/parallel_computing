@@ -28,7 +28,7 @@
 p=2
 export OMP_NUM_THREADS=$p
 echo Running on $p mpi processes
-/usr/bin/mpiexec -n $p ./sor
+/usr/lib64/openmpi-1.10/bin/mpiexec -n $p ./sor
 #done
 #done
 
