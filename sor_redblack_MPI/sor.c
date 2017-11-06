@@ -88,11 +88,11 @@ void *main(int argc, char *argv[]){
 
 		// Just to take into account that proccesses may run out of time, to avoid race condition.
 		MPI_Barrier(MPI_COMM_WORLD);
-
 		for(i=0; i<N; i++){
 				for(j=0; j<N; j++){
 					if((i+j)%2==myid){
 					MPI_Bcast(&x[i][j], 1, MPI_DOUBLE, myid, MPI_COMM_WORLD);
+					MPI_Barrier(MPI_COMM_WORLD);
 					}
 				}
 		}
