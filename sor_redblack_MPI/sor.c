@@ -27,7 +27,7 @@
 double x[N][N], xnew[N][N], solution[N][N];
 
 double calcerror(double g[][N], int iter);
-boolean first_time;
+
 
 void *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
@@ -36,11 +36,13 @@ void *main(int argc, char *argv[]){
 	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
+
 	ierr = MPI_Init(NULL, NULL); 
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 	MPI_Status status;
 	printf ("Process %d of %d is alive\n", myid, numprocs);
+	
 	total_start = omp_get_wtime();
 	h = M_PI/(double)(N-1);
 
@@ -60,24 +62,16 @@ void *main(int argc, char *argv[]){
    
 	for(i=0; i<N; i++){
 		for(j=0; j<N; j++){
-			xnew[0][j] = x[0][j];
-			xnew[N-1][j] = x[N-1][j];
+			xnew[i][j] = x[i][j];
 		}
-		xnew[i][0] = x[i][0];
-		xnew[i][N-1] = x[i][N-1];
 	}
 
 	error = calcerror(x, iter);
-	firsttime = true;
+
 	while(error >= tol){
 
 		//red for id =0
 		if(myid==0){
-			if(firstime){
-				setup black;
-				firstime= false;
-			}
-
 			for(i=1; i<N-1; i++){
 				for(j=1; j<N-1; j++){
 					if((i+j)%2==0){
@@ -85,19 +79,10 @@ void *main(int argc, char *argv[]){
 					}
 				}
 			}
-			for(i=1; i<N-1; i++){
-				for(j=1; j<N-1; j++){
-					if((i+j)%2==0){
-						x[i][j] = xnew[i][j];
-					}
-				}
-			}
-		//MPI_Sendrecv(
 		}
 
 		// black for id==1
 		if(myid==1){
-			//receive red if not first time or last
 			for(i=1; i<N-1; i++){
 				for(j=1; j<N-1; j++){
 					if((i+j)%2==1){
@@ -105,17 +90,19 @@ void *main(int argc, char *argv[]){
 					}
 				}
 			}
-			for(i=1; i<N-1; i++){
-				for(j=1; j<N-1; j++){
-					if((i+j)%2==1){
-						x[i][j] = xnew[i][j];
-					}
-				}
-			}
-		// MPI sendrecv
 		}
-	
-		MPI_Allgather(
+
+		MPI_Barrier(MPI_COMM_WORLD);
+		//MPI Bcast red to black
+		for(i=0; i<N; i++){
+				for(j=0; j<N; j++){
+					MPI_Bcast(&i
+					MPI_Bcast(&j
+					MPI_Bcast(&i
+
+//MPI Bcast black to red	
+		
+
 		iter++;
 
 		if (fmod(iter, 20) == 0)
