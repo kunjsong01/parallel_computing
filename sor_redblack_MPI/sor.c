@@ -37,25 +37,26 @@ int *main(int argc, char *argv[]){
 	double total_start;
 	double total_time = 0.0;
 	total_start = omp_get_wtime();
+
 	ierr = MPI_Init(NULL, NULL); 
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 	MPI_Status status;
-	printf ("Process %d of %d is alive\n", myid, numprocs);
+	printf ("Process %d of %d is alive\n", myid+1, numprocs);
 		
 	h = M_PI/(double)(N-1);
 
 	for(i=0; i<N; i++)
-		x[i][N-1] = sin((double)i*h);
+		x[i][N-1] = sin((double)i * h);
 	
 
 	for(i=0; i<N; i++)
 		for(j=0; j<N-1; j++)
-			x[i][j] = (double)j*h*x[i][N-1];
+			x[i][j] = (double)j * h * x[i][N-1];
 
 	for(i=0; i<N; i++)
 		for(j=0; j<N; j++)
-			solution[i][j] = sinh((double)j*h) * sin((double)i*h)/sinh(M_PI);
+			solution[i][j] = sinh((double)j * h) * sin((double)i * h)/sinh(M_PI);
 	
 	omega = 2.0/(1.0+sin(M_PI/(double)(N-1)));
    
@@ -75,29 +76,29 @@ int *main(int argc, char *argv[]){
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j+2)%2==myid){
-					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
+					xnew[i][j] = x[i][j]+0.25 * omega * (x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4 * x[i][j]));
 				}
 			}
 		}
-
+		
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++){
-			//	if((i+j+2)%2==myid){
+				if((i+j+2)%2==myid){
 					x[i][j] = xnew[i][j];
-			//	}
+				}
 			}
-		
-
+	
+	
 		// Just to take into account that proccesses may asynchronously; avoiding race condition.
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j+2)%2==myid){
 			//	printf("%i:%i,%i\n", myid, i,j);
-					MPI_Send(&x[i][j], 1, MPI_DOUBLE, (myid+3)%2, i, MPI_COMM_WORLD);
-				} else {
-					MPI_Recv(&x[i][j], 1, MPI_DOUBLE, (myid+3)%2, i, MPI_COMM_WORLD, &status);
+					MPI_Send(&x[i][j], 1, MPI_DOUBLE, ((myid+3)%2), ((N*j)+i), MPI_COMM_WORLD);
+				} else {	
+					MPI_Recv(&x[i][j], 1, MPI_DOUBLE, ((myid+3)%2), ((N*j)+i), MPI_COMM_WORLD, &status);
 				}
-				MPI_Barrier(MPI_COMM_WORLD);
+				MPI_Barrier(MPI_COMM_WORLD);				
 			}
 		}			
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -105,7 +106,6 @@ int *main(int argc, char *argv[]){
 
 		if (fmod(iter, 20) == 0)
 		  error = calcerror(x, iter);
-		
 	}
 	total_time = omp_get_wtime() - total_start;
 	printf("Omega = %0.20f\n", omega);
@@ -113,6 +113,9 @@ int *main(int argc, char *argv[]){
 	printf("Total time to convergence: %f seconds\n", total_time);
 
 	return 0;
+
+MPI_Finalize();
+
 }
 
 double calcerror(double g[][N], int iter){
