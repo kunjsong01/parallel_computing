@@ -71,7 +71,7 @@ int *main(int argc, char *argv[]){
 	error = calcerror(x, iter);
 
 	while(error >= tol){
-
+		//printf("I am process %i", myid);
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j+2)%2==myid){
