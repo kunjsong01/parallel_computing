@@ -1,0 +1,4 @@
+better_sor_wavefront_sequential.c finishes within 0.022 seconds
+sor_wavefront_sequential finishes within 1.2 seconds. 
+
+Compare these two and report. 
