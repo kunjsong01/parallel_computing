@@ -18,7 +18,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 502
+#define N 3
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -36,14 +36,13 @@ void *main(int argc, char *argv[]){
 	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
-
+	total_start = omp_get_wtime();
 	ierr = MPI_Init(NULL, NULL); 
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 	MPI_Status status;
 	printf ("Process %d of %d is alive\n", myid, numprocs);
-	
-	total_start = omp_get_wtime();
+		
 	h = M_PI/(double)(N-1);
 
 	for(i=0; i<N; i++)
@@ -86,11 +85,12 @@ void *main(int argc, char *argv[]){
 				}
 			}
 
-		// Just to take into account that proccesses may run out of time, to avoid race condition.
+		// Just to take into account that proccesses may asynchronously; avoiding race condition.
 		MPI_Barrier(MPI_COMM_WORLD);
 		for(i=0; i<N; i++){
 				for(j=0; j<N; j++){
 					if((i+j)%2==myid){
+					//printf("%i:%i,%i\n", myid, i,j);
 					MPI_Bcast(&x[i][j], 1, MPI_DOUBLE, myid, MPI_COMM_WORLD);
 					MPI_Barrier(MPI_COMM_WORLD);
 					}
@@ -120,6 +120,6 @@ double calcerror(double g[][N], int iter){
 		for(j=1; j<N-1; j++)
 			error = MAX(error, fabs(solution[i][j] - x[i][j]));
 
-	printf("On iteration %d error= %f\n",iter, error);
+	//printf("On iteration %d error= %f\n",iter, error);
 	return error;
 }
