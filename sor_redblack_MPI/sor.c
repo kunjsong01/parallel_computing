@@ -18,7 +18,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 52 
+#define N 502 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -36,6 +36,7 @@ int *main(int argc, char *argv[]){
 	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
+	boolean firstime;
 	total_start = omp_get_wtime();
 
 	ierr = MPI_Init(NULL, NULL); 
@@ -69,26 +70,30 @@ int *main(int argc, char *argv[]){
 		xnew[i][N-1] = x[i][N-1];	
 	}
 
-	error = calcerror(x, iter);
 
+	error = calcerror(x, iter);
+	
+	firstime = true;
+	// This isn't working because it is starting in a parallel way. One of red or black has to process first, perhaps. They are too in step. Perhaps this isn't as easy as intially thought.
+	MPI_Barrier(MPI_COMM_WORLD);
 	while(error >= tol){
 		//printf("I am process %i", myid);
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j+2)%2==myid){
-					xnew[i][j] = x[i][j]+0.25 * omega * (x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4 * x[i][j]));
+					xnew[i][j] = x[i][j]+(0.25 * omega * (x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4 * x[i][j])));
 				}
 			}
 		}
 		
-		for(i=1; i<N-1; i++)
+		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
 				if((i+j+2)%2==myid){
 					x[i][j] = xnew[i][j];
 				}
 			}
-	
-	
+		}
+		MPI_Barrier(MPI_COMM_WORLD);	
 		// Just to take into account that proccesses may asynchronously; avoiding race condition.
 		for(i=1; i<N-1; i++){
 			for(j=1; j<N-1; j++){
@@ -100,6 +105,7 @@ int *main(int argc, char *argv[]){
 				}
 				MPI_Barrier(MPI_COMM_WORLD);				
 			}
+			MPI_Barrier(MPI_COMM_WORLD);
 		}			
 		MPI_Barrier(MPI_COMM_WORLD);
 		iter++;
