@@ -18,7 +18,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 3
+#define N 52 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -29,7 +29,7 @@ double x[N][N], xnew[N][N], solution[N][N];
 double calcerror(double g[][N], int iter);
 
 
-void *main(int argc, char *argv[]){
+int *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
 	double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j;
@@ -61,42 +61,46 @@ void *main(int argc, char *argv[]){
    
 	for(i=0; i<N; i++){
 		for(j=0; j<N; j++){
-			xnew[i][j] = x[i][j];
+			xnew[0][j] = x[0][j];
+			xnew[N-1][j] = x[N-1][j];
 		}
+		xnew[i][0] = x[i][0];
+		xnew[i][N-1] = x[i][N-1];	
 	}
 
 	error = calcerror(x, iter);
 
 	while(error >= tol){
 
-			for(i=1; i<N-1; i++){
-				for(j=1; j<N-1; j++){
-					if((i+j)%2==myid){
-						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
-					}
+		for(i=1; i<N-1; i++){
+			for(j=1; j<N-1; j++){
+				if((i+j+2)%2==myid){
+					xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
 				}
 			}
-
-			for(i=1; i<N-1; i++){
-				for(j=1; j<N-1; j++){
-					if((i+j)%2==myid){
-						x[i][j] = xnew[i][j];
-					}
-				}
-			}
-
-		// Just to take into account that proccesses may asynchronously; avoiding race condition.
-		MPI_Barrier(MPI_COMM_WORLD);
-		for(i=0; i<N; i++){
-				for(j=0; j<N; j++){
-					if((i+j)%2==myid){
-					//printf("%i:%i,%i\n", myid, i,j);
-					MPI_Bcast(&x[i][j], 1, MPI_DOUBLE, myid, MPI_COMM_WORLD);
-					MPI_Barrier(MPI_COMM_WORLD);
-					}
-				}
 		}
 
+		for(i=1; i<N-1; i++)
+			for(j=1; j<N-1; j++){
+			//	if((i+j+2)%2==myid){
+					x[i][j] = xnew[i][j];
+			//	}
+			}
+		
+
+		// Just to take into account that proccesses may asynchronously; avoiding race condition.
+		for(i=1; i<N-1; i++){
+			for(j=1; j<N-1; j++){
+				if((i+j+2)%2==myid){
+			//	printf("%i:%i,%i\n", myid, i,j);
+					MPI_Send(&x[i][j], 1, MPI_DOUBLE, (myid+3)%2, i, MPI_COMM_WORLD);
+				} else {
+					MPI_Recv(&x[i][j], 1, MPI_DOUBLE, (myid+3)%2, i, MPI_COMM_WORLD, &status);
+				}
+				MPI_Barrier(MPI_COMM_WORLD);
+			}
+		}			
+		MPI_Barrier(MPI_COMM_WORLD);
 		iter++;
 
 		if (fmod(iter, 20) == 0)
@@ -119,7 +123,7 @@ double calcerror(double g[][N], int iter){
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++)
 			error = MAX(error, fabs(solution[i][j] - x[i][j]));
-
-	//printf("On iteration %d error= %f\n",iter, error);
+			//printf("value:%d\n", x[i][j]);
+	printf("On iteration %d error= %f\n",iter, error);
 	return error;
 }
