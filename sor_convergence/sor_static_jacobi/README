@@ -1,4 +1,5 @@
-better_sor_wavefront_sequential.c finishes within 0.022 seconds
-sor_wavefront_sequential finishes within 1.2 seconds. 
+This is the algorithm implementing Jacobi iteration to solve PDE. 
+U(k+1) is independent of that of every other, i.e. it removes the dependency in the iteration space. 
 
-Compare these two and report. 
+Please note that this algorithm increases the number of interations used to converge!
+Parallelism should be really helpful in this case. 
