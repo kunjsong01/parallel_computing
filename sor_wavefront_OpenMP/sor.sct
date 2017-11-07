@@ -23,12 +23,10 @@
 
 #for n in `seq 1 7`
 #do
-#for p in `seq 1 2`
-#do
-p=2
+for p in `seq 1 4`
+do
 export OMP_NUM_THREADS=$p
-echo Running on $p mpi processes
-/usr/lib64/openmpi-1.10/bin/mpiexec -n $p ./sor
+echo Running on $p threads
+./sor
+done
 #done
-#done
-

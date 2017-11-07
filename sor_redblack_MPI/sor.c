@@ -20,7 +20,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 3
+#define N 502 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -31,43 +31,49 @@ double x[N][N], xnew[N][N], solution[N][N];
 double calcerror(double g[][N], int iter);
 
 
-void *main(int argc, char *argv[]){
+int *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
 	double pi = (double)4.0*atan((double)1.0);
 	int iter=0, i, j, M;
 	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
+	boolean firstime;
 	total_start = omp_get_wtime();
+
 	ierr = MPI_Init(NULL, NULL); 
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 	MPI_Status status;
-	printf ("Process %d of %d is alive\n", myid, numprocs);
+	printf ("Process %d of %d is alive\n", myid+1, numprocs);
 		
 	h = M_PI/(double)(N-1);
 
 	M = 4;
 
 	for(i=0; i<N; i++)
-		x[i][N-1] = sin((double)i*h);
+		x[i][N-1] = sin((double)i * h);
 	
 
 	for(i=0; i<N; i++)
 		for(j=0; j<N-1; j++)
-			x[i][j] = (double)j*h*x[i][N-1];
+			x[i][j] = (double)j * h * x[i][N-1];
 
 	for(i=0; i<N; i++)
 		for(j=0; j<N; j++)
-			solution[i][j] = sinh((double)j*h) * sin((double)i*h)/sinh(M_PI);
+			solution[i][j] = sinh((double)j * h) * sin((double)i * h)/sinh(M_PI);
 	
 	omega = 2.0/(1.0+sin(M_PI/(double)(N-1)));
    
 	for(i=0; i<N; i++){
 		for(j=0; j<N; j++){
-			xnew[i][j] = x[i][j];
+			xnew[0][j] = x[0][j];
+			xnew[N-1][j] = x[N-1][j];
 		}
+		xnew[i][0] = x[i][0];
+		xnew[i][N-1] = x[i][N-1];	
 	}
+<<<<<<< HEAD
 // split the grid in quarters (will only work on even grids
 // each processor works on left most
 // second process shares result
@@ -75,42 +81,60 @@ void *main(int argc, char *argv[]){
 // first process shares strip
 // loop
 	error = calcerror(x, iter);
+=======
 
+>>>>>>> 537fdb862668a7f2cafde099a774633fda995e7b
+
+	error = calcerror(x, iter);
+	
+	firstime = true;
+	// This isn't working because it is starting in a parallel way. One of red or black has to process first, perhaps. They are too in step. Perhaps this isn't as easy as intially thought.
+	MPI_Barrier(MPI_COMM_WORLD);
 	while(error >= tol){
+<<<<<<< HEAD
 		myid+1			
 			for(i=1; i<M/2; i++){
 				for(j=1; j<N-1; j++){
 					if((i+j)%2==myid){
 						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
 					}
+=======
+		//printf("I am process %i", myid);
+		for(i=1; i<N-1; i++){
+			for(j=1; j<N-1; j++){
+				if((i+j+2)%2==myid){
+					xnew[i][j] = x[i][j]+(0.25 * omega * (x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4 * x[i][j])));
+>>>>>>> 537fdb862668a7f2cafde099a774633fda995e7b
 				}
 			}
-
-			for(i=1; i<N-1; i++){
-				for(j=1; j<N-1; j++){
-					if((i+j)%2==myid){
-						x[i][j] = xnew[i][j];
-					}
-				}
-			}
-
-		// Just to take into account that proccesses may asynchronously; avoiding race condition.
-		MPI_Barrier(MPI_COMM_WORLD);
-		for(i=0; i<N; i++){
-				for(j=0; j<N; j++){
-					if((i+j)%2==myid){
-					//printf("%i:%i,%i\n", myid, i,j);
-					MPI_Bcast(&x[i][j], 1, MPI_DOUBLE, myid, MPI_COMM_WORLD);
-					MPI_Barrier(MPI_COMM_WORLD);
-					}
-				}
 		}
-
+		
+		for(i=1; i<N-1; i++){
+			for(j=1; j<N-1; j++){
+				if((i+j+2)%2==myid){
+					x[i][j] = xnew[i][j];
+				}
+			}
+		}
+		MPI_Barrier(MPI_COMM_WORLD);	
+		// Just to take into account that proccesses may asynchronously; avoiding race condition.
+		for(i=1; i<N-1; i++){
+			for(j=1; j<N-1; j++){
+				if((i+j+2)%2==myid){
+			//	printf("%i:%i,%i\n", myid, i,j);
+					MPI_Send(&x[i][j], 1, MPI_DOUBLE, ((myid+3)%2), ((N*j)+i), MPI_COMM_WORLD);
+				} else {	
+					MPI_Recv(&x[i][j], 1, MPI_DOUBLE, ((myid+3)%2), ((N*j)+i), MPI_COMM_WORLD, &status);
+				}
+				MPI_Barrier(MPI_COMM_WORLD);				
+			}
+			MPI_Barrier(MPI_COMM_WORLD);
+		}			
+		MPI_Barrier(MPI_COMM_WORLD);
 		iter++;
 
 		if (fmod(iter, 20) == 0)
 		  error = calcerror(x, iter);
-		
 	}
 	total_time = omp_get_wtime() - total_start;
 	printf("Omega = %0.20f\n", omega);
@@ -118,6 +142,9 @@ void *main(int argc, char *argv[]){
 	printf("Total time to convergence: %f seconds\n", total_time);
 
 	return 0;
+
+MPI_Finalize();
+
 }
 
 double calcerror(double g[][N], int iter){
@@ -128,7 +155,7 @@ double calcerror(double g[][N], int iter){
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++)
 			error = MAX(error, fabs(solution[i][j] - x[i][j]));
-
-	//printf("On iteration %d error= %f\n",iter, error);
+			//printf("value:%d\n", x[i][j]);
+	printf("On iteration %d error= %f\n",iter, error);
 	return error;
 }
