@@ -93,7 +93,6 @@ int main(int argc, char *argv[]){
 					xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] \
 									+ x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
 				}
-				#pragma omp parallel for
 				for(i=1; i<N-1; i++)
 					for(j=1; j<N-1; j++)
 						x[i][j] = xnew[i][j];
@@ -107,7 +106,6 @@ int main(int argc, char *argv[]){
 					xnew[j][i-j] = x[j][i-j]+0.25*omega*(xnew[j-1][i-j] + xnew[j][i-j-1] \
 									+ x[j+1][i-j] + x[j][i-j+1] - (4*x[j][i-j]));
 				}
-				#pragma omp parallel for
 				for(i=1; i<N-1; i++)
 					for(j=1; j<N-1; j++)
 						x[i][j] = xnew[i][j];
