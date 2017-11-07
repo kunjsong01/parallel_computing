@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 180 
+#define N 268 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 double x[N][N], xnew[N][N], solution[N][N];
@@ -80,10 +80,6 @@ int main(int argc, char *argv[]){
 			}
 
 		}				
-
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++)
-				x[i][j] = xnew[i][j];
 
 		iter++;
 

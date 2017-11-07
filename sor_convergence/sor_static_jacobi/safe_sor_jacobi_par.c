@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 843 
+#define N 180 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 double x[N][N], xnew[N][N], solution[N][N];
@@ -64,12 +64,27 @@ int main(int argc, char *argv[]){
 
 	while(error >= tol){
 
-		for(i=1; i<N-1; i++)
-			for(j=1; j<N-1; j++){
+		#pragma omp parallel for \
+			schedule(static, 1)
+		for(i=1; i<N-1; i++){
+			#pragma omp critical
+			{
+				// mimic the pipeline
+				// The next thread is waiting for the previous thread finishing updating the first element in the row
+				xnew[i][1] = x[i][1]+0.25*omega*(x[i-1][1] + x[i][1-1] + x[i+1][1] + x[i][1+1] - (4*x[i][1]));
+				x[i][1] = xnew[i][1];
+			}
+			for(j=2; j<N-1; j++){
 				xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
 				x[i][j] = xnew[i][j];
 			}
-				
+
+		}				
+
+		for(i=1; i<N-1; i++)
+			for(j=1; j<N-1; j++)
+				x[i][j] = xnew[i][j];
+
 		iter++;
 
 		if (fmod(iter, 20) == 0)
