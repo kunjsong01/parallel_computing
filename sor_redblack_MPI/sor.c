@@ -4,6 +4,8 @@
 #include <omp.h>
 #include <mpi.h>
 
+//This is all wrong. I was trying to do the impossible!
+
 // ***  Solution of Laplace's Equation.
 // ***
 // ***  Uxx + Uyy = 0
@@ -32,7 +34,7 @@ double calcerror(double g[][N], int iter);
 void *main(int argc, char *argv[]){
 	double tol=0.001, h, omega, error;
 	double pi = (double)4.0*atan((double)1.0);
-	int iter=0, i, j;
+	int iter=0, i, j, M;
 	int myid, numprocs, rc, ierr;
 	double total_start;
 	double total_time = 0.0;
@@ -44,6 +46,8 @@ void *main(int argc, char *argv[]){
 	printf ("Process %d of %d is alive\n", myid, numprocs);
 		
 	h = M_PI/(double)(N-1);
+
+	M = 4;
 
 	for(i=0; i<N; i++)
 		x[i][N-1] = sin((double)i*h);
@@ -64,12 +68,17 @@ void *main(int argc, char *argv[]){
 			xnew[i][j] = x[i][j];
 		}
 	}
-
+// split the grid in quarters (will only work on even grids
+// each processor works on left most
+// second process shares result
+// first process works on adjacent strip
+// first process shares strip
+// loop
 	error = calcerror(x, iter);
 
 	while(error >= tol){
-
-			for(i=1; i<N-1; i++){
+		myid+1			
+			for(i=1; i<M/2; i++){
 				for(j=1; j<N-1; j++){
 					if((i+j)%2==myid){
 						xnew[i][j] = x[i][j]+0.25*omega*(x[i-1][j] + x[i][j-1] + x[i+1][j] + x[i][j+1] - (4*x[i][j]));
