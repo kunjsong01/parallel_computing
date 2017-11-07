@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 502
+#define N 180 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 

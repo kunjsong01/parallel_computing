@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and N = 502 in 980 iterations.
 // *** 
 
-#define N 180 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
+#define N 502 // 50 is a good size to be used for debugging. The wavefront algorithm is VERY slow on sequential machines. 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 // To paralise the code, x[][], xnew[][] and solution[][] should not be global
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
+		#pragma omp parallel for
 		for(i=1; i<N-1; i++)
 			for(j=1; j<N-1; j++)
 				x[i][j] = xnew[i][j];

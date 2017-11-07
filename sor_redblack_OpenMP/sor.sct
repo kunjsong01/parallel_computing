@@ -23,7 +23,7 @@
 
 #for n in `seq 1 7`
 #do
-for p in `seq 1 4`
+for p in `seq 1 36`
 do
 export OMP_NUM_THREADS=$p
 echo Running on $p threads
