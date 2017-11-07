@@ -19,5 +19,5 @@ for p in 1 2 3 4 6 8 12 24 36
 do
 	export OMP_NUM_THREADS=$p
 	echo "Running on $p threads"
-	./sor_jacobi_seq
+	./sor_jacobi_par
 done

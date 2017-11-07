@@ -17,7 +17,7 @@
 // ***   and with tol = 0.001 and M = 502 in 980 iterations.
 // *** 
 
-#define N 50 
+#define N 180 
 #define MAX(a,b)  ( ( (a)>(b) ) ? (a) : (b) )
 
 double x[N][N], xnew[N][N], solution[N][N];
@@ -64,10 +64,10 @@ int main(int argc, char *argv[]){
 
 	while(error >= tol){
 
-		#pragma omp parallel for \
+		#pragma omp parallel for ordered \
 			schedule(static, 1)
 		for(i=1; i<N-1; i++){
-			#pragma omp critical
+			#pragma omp ordered
 			{
 				// mimic the pipeline
 				// The next thread is waiting for the previous thread finishing updating the first element in the row
