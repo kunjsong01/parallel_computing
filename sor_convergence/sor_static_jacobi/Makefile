@@ -17,5 +17,8 @@ sor: sor.o
 sor_jacobi_seq: sor_jacobi_seq.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
+sor_jacobi_par: sor_jacobi_par.o
+	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
+
 clean:
-	rm *.o sor sor_jacobi_seq 
+	rm *.o sor sor_jacobi_seq sor_jacobi_par
