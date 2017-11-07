@@ -4,7 +4,7 @@
 #include <omp.h>
 
 /*
- * This is the parallel version of sor algorithm to solve the Laplace Equation.
+ * TO-DO:  This is the parallel version of sor algorithm to solve the Laplace Equation.
  * The main strategy is to:
  * 		- Separate the iterative computation blocks from the main routine to
  * 		  make them easier for parallelisation
@@ -124,6 +124,7 @@ int main(int argc, char *argv[]){
 
 void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solution_matrix, double h, int N){
 	int i, j;
+
 	for(i=0; i<N; i++)
 		x_matrix[i][N-1] = sin((double)i*h);
 	for(i=0; i<N; i++)
@@ -147,7 +148,8 @@ void matrix_initialise(double **x_matrix, double **xnew_matrix, double **solutio
 void update_points(double **x_matrix, double **xnew_matrix, double omega, int N){
 
 	int i, j;
-	// update points in x, put it in the xnew buffer and copy back to x 
+	
+	// update points in x, put it in the xnew and copy back to x 
 	for(i=1; i<N-1; i++)
 		for(j=1; j<N-1; j++){
 			xnew_matrix[i][j] = x_matrix[i][j]+0.25*omega*(xnew_matrix[i-1][j] + xnew_matrix[i][j-1] + x_matrix[i+1][j] + x_matrix[i][j+1] - (4*x_matrix[i][j]));

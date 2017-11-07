@@ -1,8 +1,9 @@
 CC = /opt/rh/devtoolset-2/root/usr/bin/gcc
 #CC = gcc
 OMP_FLAG = -fopenmp
+CFLAGS = -O1 -c ${OMP_FLAG}
 #CFLAGS = -O2 -c ${OMP_FLAG}
-CFLAGS = -O2 -c ${OMP_FLAG}
+#CFLAGS = -c ${OMP_FLAG}
 LFLAGS = -lm
 
 .SUFFIXES : .o .c
@@ -13,8 +14,11 @@ LFLAGS = -lm
 sor: sor.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
-sor_par: sor_par.o
+sor_jacobi_seq: sor_jacobi_seq.o
+	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
+
+sor_jacobi_par: sor_jacobi_par.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
 clean:
-	rm *.o sor sor_par 
+	rm *.o sor sor_jacobi_seq sor_jacobi_par

@@ -10,11 +10,11 @@ LFLAGS = -lm
 .c.o:
 	${CC} ${CFLAGS} -o $@ $*.c
 
-sor: sor.o
+sor_dynamic: sor_dynamic.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
 sor_par: sor_par.o
 	${CC} ${OMP_FLAG} -o $@ $@.o ${LFLAGS}
 
 clean:
-	rm *.o sor sor_par 
+	rm *.o sor_dynamic sor_par 

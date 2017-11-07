@@ -1,4 +1,0 @@
-This version separates the boundary_condition function from the matrix_initialise function.
-
-This version aims to experiment with the impact of scheduling, e.g. having additional function pointer on the stack.
-
