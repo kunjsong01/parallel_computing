@@ -1,5 +1,11 @@
 This is the algorithm implementing Jacobi iteration to solve PDE. 
 U(k+1) is independent of that of every other, i.e. it removes the dependency in the iteration space. 
 
-Please note that this algorithm increases the number of interations used to converge!
-Parallelism should be really helpful in this case. 
+The main idea used in parallel implementation for this program is pipeline.
+The (i+1)-th thread won't start processing the assigned task (a row in this case) until the precedent thread, 
+the i-th thread, finishes processing of the first element in its own assign task. 
+
+Note that this idea requires the usage of the following scheduling method: 
+    - schedule(static, 1) 
+
+Chunk size being greater than one will not guaranteen the correct order of calculation in the iteration space. 
